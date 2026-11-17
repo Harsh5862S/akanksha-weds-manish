@@ -40,3 +40,9 @@ No Node.js, backend, database, or environment variables are required.
 - Mob.: 94163-68711, 72064-84408
 
 The spelling “Surkhsha” and venue spelling “SAVITRII LAWNS” are retained as printed in the PDF.
+
+
+## Latest updates
+- Page order is now: wedding date/scratch reveal first, programme second, family invitation third.
+- Added the supplied `Din Shagna Da` MP3 as optional looping background music. Visitors start/pause it using the floating music control; audible autoplay is not forced by browsers.
+- Music file is stored at `assets/din-shagna-da.mp3`.

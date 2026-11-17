@@ -66,114 +66,103 @@ document.getElementById("addCalendar").addEventListener("click", () => {
   notify("Wedding date calendar file downloaded.");
 });
 
-// Interactive scratch-off reveal for the wedding date.
+
+// Scratch-to-reveal date: works with mouse, touch and stylus.
 (() => {
-  const canvas = document.getElementById("scratchLayer");
-  const wrapper = document.getElementById("scratchDate");
-  const hint = document.getElementById("scratchHint");
+  const canvas = document.getElementById('scratchLayer');
+  const wrapper = document.getElementById('scratchDate');
+  const hint = document.getElementById('scratchHint');
   if (!canvas || !wrapper) return;
+  const ctx = canvas.getContext('2d', { willReadFrequently: true });
+  let drawing = false;
+  let lastCheck = 0;
 
-  const context = canvas.getContext("2d", { willReadFrequently: true });
-  let isDrawing = false;
-  let lastPoint = null;
-  let checkCounter = 0;
-  let revealed = false;
-
-  function paintScratchSurface() {
-    const bounds = wrapper.getBoundingClientRect();
-    if (!bounds.width || !bounds.height) return;
-    const ratio = Math.min(window.devicePixelRatio || 1, 2);
-    canvas.width = Math.round(bounds.width * ratio);
-    canvas.height = Math.round(bounds.height * ratio);
-    canvas.style.width = `${bounds.width}px`;
-    canvas.style.height = `${bounds.height}px`;
-    context.setTransform(ratio, 0, 0, ratio, 0, 0);
-
-    const gradient = context.createLinearGradient(0, 0, bounds.width, bounds.height);
-    gradient.addColorStop(0, "#d8bd82");
-    gradient.addColorStop(.48, "#a8793e");
-    gradient.addColorStop(1, "#e8d09b");
-    context.globalCompositeOperation = "source-over";
-    context.fillStyle = gradient;
-    context.fillRect(0, 0, bounds.width, bounds.height);
-
-    // Fine flecks give the gold coating a tactile, foil-like finish.
-    for (let i = 0; i < 100; i++) {
-      const x = (i * 47.37) % bounds.width;
-      const y = (i * 23.91) % bounds.height;
-      context.fillStyle = i % 2 ? "rgba(255,250,220,.25)" : "rgba(75,35,20,.12)";
-      context.beginPath();
-      context.arc(x, y, i % 3 === 0 ? 1.1 : .6, 0, Math.PI * 2);
-      context.fill();
+  function paintCover() {
+    const rect = wrapper.getBoundingClientRect();
+    const dpr = Math.max(1, window.devicePixelRatio || 1);
+    canvas.width = Math.round(rect.width * dpr);
+    canvas.height = Math.round(rect.height * dpr);
+    ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+    const gradient = ctx.createLinearGradient(0, 0, rect.width, rect.height);
+    gradient.addColorStop(0, '#8d642d');
+    gradient.addColorStop(.45, '#d6b36e');
+    gradient.addColorStop(1, '#9b713b');
+    ctx.globalCompositeOperation = 'source-over';
+    ctx.fillStyle = gradient;
+    ctx.fillRect(0, 0, rect.width, rect.height);
+    ctx.fillStyle = 'rgba(255,255,255,.28)';
+    for (let x = 8; x < rect.width; x += 18) {
+      ctx.fillRect(x, 0, 1, rect.height);
     }
-    context.globalCompositeOperation = "source-over";
-    context.strokeStyle = "rgba(255,248,225,.65)";
-    context.lineWidth = 1;
-    context.strokeRect(.5, .5, bounds.width - 1, bounds.height - 1);
+    ctx.globalCompositeOperation = 'destination-out';
   }
-
-  function pointFromEvent(event) {
+  function point(event) {
     const rect = canvas.getBoundingClientRect();
     return { x: event.clientX - rect.left, y: event.clientY - rect.top };
   }
-
-  function scratchLine(from, to) {
-    context.save();
-    context.globalCompositeOperation = "destination-out";
-    context.lineCap = "round";
-    context.lineJoin = "round";
-    context.lineWidth = 34;
-    context.beginPath();
-    context.moveTo(from.x, from.y);
-    context.lineTo(to.x, to.y);
-    context.stroke();
-    context.restore();
+  function erase(event) {
+    const p = point(event);
+    ctx.beginPath();
+    ctx.arc(p.x, p.y, 18, 0, Math.PI * 2);
+    ctx.fill();
   }
-
-  function revealIfMostlyScratched() {
-    checkCounter++;
-    if (checkCounter % 5 !== 0 || revealed) return;
-    const pixels = context.getImageData(0, 0, canvas.width, canvas.height).data;
+  function revealIfEnough() {
+    const now = Date.now();
+    if (now - lastCheck < 250 || wrapper.classList.contains('revealed')) return;
+    lastCheck = now;
+    const pixels = ctx.getImageData(0, 0, canvas.width, canvas.height).data;
     let transparent = 0;
-    // Sample every 16th pixel for a fast estimate on mobile devices.
-    for (let i = 3; i < pixels.length; i += 64) {
-      if (pixels[i] < 80) transparent++;
-    }
-    const clearedRatio = transparent / (pixels.length / 64);
-    if (clearedRatio > .42) {
-      revealed = true;
-      wrapper.classList.add("is-revealed");
-      if (hint) hint.textContent = "DATE REVEALED ♥";
-      window.setTimeout(() => canvas.remove(), 550);
+    for (let i = 3; i < pixels.length; i += 4 * 12) if (pixels[i] < 80) transparent++;
+    if (transparent / (pixels.length / (4 * 12)) > .48) {
+      wrapper.classList.add('revealed');
+      canvas.style.transition = 'opacity .5s ease';
+      canvas.style.opacity = '0';
+      window.setTimeout(() => { canvas.hidden = true; }, 550);
     }
   }
-
-  canvas.addEventListener("pointerdown", event => {
-    if (revealed) return;
-    isDrawing = true;
-    lastPoint = pointFromEvent(event);
-    wrapper.classList.add("is-scratching");
+  canvas.addEventListener('pointerdown', event => {
+    drawing = true;
     canvas.setPointerCapture(event.pointerId);
-    scratchLine(lastPoint, lastPoint);
+    erase(event);
+    event.preventDefault();
   });
-
-  canvas.addEventListener("pointermove", event => {
-    if (!isDrawing || revealed) return;
-    const nextPoint = pointFromEvent(event);
-    scratchLine(lastPoint, nextPoint);
-    lastPoint = nextPoint;
-    revealIfMostlyScratched();
+  canvas.addEventListener('pointermove', event => {
+    if (!drawing) return;
+    erase(event);
+    revealIfEnough();
+    event.preventDefault();
   });
+  const stop = () => { drawing = false; revealIfEnough(); };
+  canvas.addEventListener('pointerup', stop);
+  canvas.addEventListener('pointercancel', stop);
+  if (hint) hint.textContent = '✦ SCRATCH TO REVEAL ✦';
+  paintCover();
+  window.addEventListener('resize', () => { if (!wrapper.classList.contains('revealed')) paintCover(); });
+})();
 
-  function stopScratching() { isDrawing = false; lastPoint = null; }
-  canvas.addEventListener("pointerup", stopScratching);
-  canvas.addEventListener("pointercancel", stopScratching);
-  canvas.addEventListener("lostpointercapture", stopScratching);
-
-  paintScratchSurface();
-  if ("ResizeObserver" in window) {
-    new ResizeObserver(() => { if (!revealed) paintScratchSurface(); }).observe(wrapper);
-  } else {
-    window.addEventListener("resize", () => { if (!revealed) paintScratchSurface(); });
-  }
+// Visitor-initiated background music (browsers block audible autoplay).
+(() => {
+  const music = document.getElementById('weddingMusic');
+  const button = document.getElementById('musicToggle');
+  if (!music || !button) return;
+  const label = button.querySelector('.music-label');
+  button.addEventListener('click', async () => {
+    if (music.paused) {
+      try {
+        await music.play();
+        button.classList.add('is-playing');
+        button.setAttribute('aria-pressed', 'true');
+        button.setAttribute('aria-label', 'Pause wedding background music');
+        if (label) label.textContent = 'Pause music';
+      } catch (error) {
+        if (label) label.textContent = 'Tap to play music';
+      }
+    } else {
+      music.pause();
+      button.classList.remove('is-playing');
+      button.setAttribute('aria-pressed', 'false');
+      button.setAttribute('aria-label', 'Play wedding background music');
+      if (label) label.textContent = 'Play wedding music';
+    }
+  });
 })();
