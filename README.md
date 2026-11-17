@@ -23,6 +23,7 @@ Then visit `http://localhost:8000`.
 No Node.js, backend, database, or environment variables are required.
 
 ## Included interactions
+- Interactive scratch-off gold foil reveal on the 5 December 2026 date panel (mouse or touch).
 - Live countdown to the wedding date/time.
 - Copy venue address.
 - Download an `.ics` calendar event.

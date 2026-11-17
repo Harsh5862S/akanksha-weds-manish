@@ -65,3 +65,115 @@ document.getElementById("addCalendar").addEventListener("click", () => {
   URL.revokeObjectURL(url);
   notify("Wedding date calendar file downloaded.");
 });
+
+// Interactive scratch-off reveal for the wedding date.
+(() => {
+  const canvas = document.getElementById("scratchLayer");
+  const wrapper = document.getElementById("scratchDate");
+  const hint = document.getElementById("scratchHint");
+  if (!canvas || !wrapper) return;
+
+  const context = canvas.getContext("2d", { willReadFrequently: true });
+  let isDrawing = false;
+  let lastPoint = null;
+  let checkCounter = 0;
+  let revealed = false;
+
+  function paintScratchSurface() {
+    const bounds = wrapper.getBoundingClientRect();
+    if (!bounds.width || !bounds.height) return;
+    const ratio = Math.min(window.devicePixelRatio || 1, 2);
+    canvas.width = Math.round(bounds.width * ratio);
+    canvas.height = Math.round(bounds.height * ratio);
+    canvas.style.width = `${bounds.width}px`;
+    canvas.style.height = `${bounds.height}px`;
+    context.setTransform(ratio, 0, 0, ratio, 0, 0);
+
+    const gradient = context.createLinearGradient(0, 0, bounds.width, bounds.height);
+    gradient.addColorStop(0, "#d8bd82");
+    gradient.addColorStop(.48, "#a8793e");
+    gradient.addColorStop(1, "#e8d09b");
+    context.globalCompositeOperation = "source-over";
+    context.fillStyle = gradient;
+    context.fillRect(0, 0, bounds.width, bounds.height);
+
+    // Fine flecks give the gold coating a tactile, foil-like finish.
+    for (let i = 0; i < 100; i++) {
+      const x = (i * 47.37) % bounds.width;
+      const y = (i * 23.91) % bounds.height;
+      context.fillStyle = i % 2 ? "rgba(255,250,220,.25)" : "rgba(75,35,20,.12)";
+      context.beginPath();
+      context.arc(x, y, i % 3 === 0 ? 1.1 : .6, 0, Math.PI * 2);
+      context.fill();
+    }
+    context.globalCompositeOperation = "source-over";
+    context.strokeStyle = "rgba(255,248,225,.65)";
+    context.lineWidth = 1;
+    context.strokeRect(.5, .5, bounds.width - 1, bounds.height - 1);
+  }
+
+  function pointFromEvent(event) {
+    const rect = canvas.getBoundingClientRect();
+    return { x: event.clientX - rect.left, y: event.clientY - rect.top };
+  }
+
+  function scratchLine(from, to) {
+    context.save();
+    context.globalCompositeOperation = "destination-out";
+    context.lineCap = "round";
+    context.lineJoin = "round";
+    context.lineWidth = 34;
+    context.beginPath();
+    context.moveTo(from.x, from.y);
+    context.lineTo(to.x, to.y);
+    context.stroke();
+    context.restore();
+  }
+
+  function revealIfMostlyScratched() {
+    checkCounter++;
+    if (checkCounter % 5 !== 0 || revealed) return;
+    const pixels = context.getImageData(0, 0, canvas.width, canvas.height).data;
+    let transparent = 0;
+    // Sample every 16th pixel for a fast estimate on mobile devices.
+    for (let i = 3; i < pixels.length; i += 64) {
+      if (pixels[i] < 80) transparent++;
+    }
+    const clearedRatio = transparent / (pixels.length / 64);
+    if (clearedRatio > .42) {
+      revealed = true;
+      wrapper.classList.add("is-revealed");
+      if (hint) hint.textContent = "DATE REVEALED ♥";
+      window.setTimeout(() => canvas.remove(), 550);
+    }
+  }
+
+  canvas.addEventListener("pointerdown", event => {
+    if (revealed) return;
+    isDrawing = true;
+    lastPoint = pointFromEvent(event);
+    wrapper.classList.add("is-scratching");
+    canvas.setPointerCapture(event.pointerId);
+    scratchLine(lastPoint, lastPoint);
+  });
+
+  canvas.addEventListener("pointermove", event => {
+    if (!isDrawing || revealed) return;
+    const nextPoint = pointFromEvent(event);
+    scratchLine(lastPoint, nextPoint);
+    lastPoint = nextPoint;
+    revealIfMostlyScratched();
+  });
+
+  function stopScratching() { isDrawing = false; lastPoint = null; }
+  canvas.addEventListener("pointerup", stopScratching);
+  canvas.addEventListener("pointercancel", stopScratching);
+  canvas.addEventListener("lostpointercapture", stopScratching);
+
+  paintScratchSurface();
+  if ("ResizeObserver" in window) {
+    new ResizeObserver(() => { if (!revealed) paintScratchSurface(); }).observe(wrapper);
+  } else {
+    window.addEventListener("resize", () => { if (!revealed) paintScratchSurface(); });
+  }
+})();
