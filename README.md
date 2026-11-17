@@ -52,3 +52,7 @@ The spelling “Surkhsha” and venue spelling “SAVITRII LAWNS” are retained
 - Section order: wedding date/scratch reveal first, family invitation second, programme/venue third.
 - Background music attempts to autoplay on page load and starts on the visitor's first interaction if the browser blocks audible autoplay. A music toggle remains available.
 - Browsers may block audible autoplay unless the visitor has interacted with the page or previously allowed sound. This browser policy cannot be reliably overridden by website code.
+
+
+## Typography refinement
+The bride and groom names use the Allura script font so the capital A in “Akanksha” has a clearer, more recognizable letterform.
