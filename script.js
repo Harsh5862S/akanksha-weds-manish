@@ -115,50 +115,57 @@ document.getElementById("addCalendar").addEventListener("click", () => {
   const wrap = document.getElementById('scratchDate');
   const canvas = document.getElementById('scratchLayer');
   if (!wrap || !canvas) return;
+
   const ctx = canvas.getContext('2d', { willReadFrequently: true });
   if (!ctx) return;
 
   let drawing = false;
   let lastPoint = null;
   let revealed = false;
-  let checkCounter = 0;
+  let resizeObserver;
 
   function paintCover() {
+    if (revealed) return;
     const rect = wrap.getBoundingClientRect();
-    if (!rect.width || !rect.height) return;
-    const dpr = Math.max(1, window.devicePixelRatio || 1);
+    if (rect.width < 2 || rect.height < 2) return;
+
+    const dpr = Math.max(1, Math.min(2, window.devicePixelRatio || 1));
     canvas.width = Math.round(rect.width * dpr);
     canvas.height = Math.round(rect.height * dpr);
-    canvas.style.width = rect.width + 'px';
-    canvas.style.height = rect.height + 'px';
+    canvas.style.width = `${rect.width}px`;
+    canvas.style.height = `${rect.height}px`;
     ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
-    const gradient = ctx.createLinearGradient(0, 0, rect.width, rect.height);
-    gradient.addColorStop(0, '#9b713e');
-    gradient.addColorStop(.45, '#e0c080');
-    gradient.addColorStop(1, '#9b713e');
     ctx.globalCompositeOperation = 'source-over';
+
+    const gradient = ctx.createLinearGradient(0, 0, rect.width, rect.height);
+    gradient.addColorStop(0, '#8d642e');
+    gradient.addColorStop(0.48, '#e6c987');
+    gradient.addColorStop(1, '#9c713b');
     ctx.fillStyle = gradient;
     ctx.fillRect(0, 0, rect.width, rect.height);
-    ctx.fillStyle = 'rgba(255,255,255,.18)';
-    for (let x = -rect.height; x < rect.width; x += 12) {
-      ctx.save();
-      ctx.translate(x, 0);
-      ctx.rotate(-.55);
-      ctx.fillRect(0, 0, 2, rect.height * 2);
-      ctx.restore();
+
+    // Subtle metallic texture on the scratch-off surface.
+    ctx.save();
+    ctx.strokeStyle = 'rgba(255,255,255,.22)';
+    ctx.lineWidth = 1;
+    for (let x = -rect.height; x < rect.width + rect.height; x += 11) {
+      ctx.beginPath();
+      ctx.moveTo(x, 0);
+      ctx.lineTo(x + rect.height * 0.45, rect.height);
+      ctx.stroke();
     }
+    ctx.restore();
     ctx.globalCompositeOperation = 'destination-out';
-    revealed = false;
     wrap.classList.remove('is-revealed');
   }
 
-  function pointFromEvent(event) {
+  function getPoint(event) {
     const rect = canvas.getBoundingClientRect();
     return { x: event.clientX - rect.left, y: event.clientY - rect.top };
   }
 
-  function scratchTo(point) {
-    const radius = Math.max(13, Math.min(22, canvas.clientHeight * .34));
+  function eraseAt(point) {
+    const radius = Math.max(16, Math.min(24, canvas.clientHeight * 0.42));
     ctx.globalCompositeOperation = 'destination-out';
     ctx.lineCap = 'round';
     ctx.lineJoin = 'round';
@@ -173,21 +180,23 @@ document.getElementById("addCalendar").addEventListener("click", () => {
     ctx.arc(point.x, point.y, radius, 0, Math.PI * 2);
     ctx.fill();
     lastPoint = point;
-    if (++checkCounter % 8 === 0) checkReveal();
   }
 
   function checkReveal() {
     if (revealed || !canvas.width || !canvas.height) return;
-    const pixels = ctx.getImageData(0, 0, canvas.width, canvas.height).data;
+    const data = ctx.getImageData(0, 0, canvas.width, canvas.height).data;
     let transparent = 0;
-    // Sample every 32nd pixel for a quick estimate of cleared area.
-    for (let i = 3; i < pixels.length; i += 128) {
-      if (pixels[i] < 80) transparent++;
+    let samples = 0;
+    // Inspect every 16th pixel to estimate how much of the coating was erased.
+    for (let pixel = 0; pixel < data.length; pixel += 64) {
+      samples++;
+      if (data[pixel + 3] < 100) transparent++;
     }
-    const samples = Math.ceil(pixels.length / 128);
-    if (transparent / samples > .43) {
+    if (samples && transparent / samples >= 0.38) {
       revealed = true;
+      drawing = false;
       wrap.classList.add('is-revealed');
+      ctx.clearRect(0, 0, canvas.width, canvas.height);
     }
   }
 
@@ -195,28 +204,43 @@ document.getElementById("addCalendar").addEventListener("click", () => {
     if (revealed) return;
     drawing = true;
     lastPoint = null;
-    canvas.setPointerCapture?.(event.pointerId);
-    scratchTo(pointFromEvent(event));
+    if (canvas.setPointerCapture) canvas.setPointerCapture(event.pointerId);
+    eraseAt(getPoint(event));
     event.preventDefault();
   });
+
   canvas.addEventListener('pointermove', event => {
     if (!drawing || revealed) return;
-    scratchTo(pointFromEvent(event));
+    eraseAt(getPoint(event));
     event.preventDefault();
   });
-  const stopDrawing = () => { drawing = false; lastPoint = null; checkReveal(); };
-  canvas.addEventListener('pointerup', stopDrawing);
-  canvas.addEventListener('pointercancel', stopDrawing);
-  canvas.addEventListener('lostpointercapture', stopDrawing);
 
-  // Initialize after layout/fonts settle so the canvas matches the visible date panel.
-  const init = () => requestAnimationFrame(paintCover);
-  if (document.fonts && document.fonts.ready) document.fonts.ready.then(init);
-  else window.addEventListener('load', init, { once: true });
-  let resizeTimer;
-  window.addEventListener('resize', () => {
-    if (revealed) return;
-    clearTimeout(resizeTimer);
-    resizeTimer = setTimeout(paintCover, 150);
-  });
+  function finishScratch() {
+    if (!drawing) return;
+    drawing = false;
+    lastPoint = null;
+    checkReveal();
+  }
+  canvas.addEventListener('pointerup', finishScratch);
+  canvas.addEventListener('pointercancel', finishScratch);
+  canvas.addEventListener('lostpointercapture', finishScratch);
+
+  function initialize() {
+    requestAnimationFrame(() => requestAnimationFrame(paintCover));
+  }
+  if (document.readyState === 'loading') {
+    document.addEventListener('DOMContentLoaded', initialize, { once: true });
+  } else {
+    initialize();
+  }
+  if ('ResizeObserver' in window) {
+    resizeObserver = new ResizeObserver(() => {
+      if (!revealed) paintCover();
+    });
+    resizeObserver.observe(wrap);
+  } else {
+    window.addEventListener('resize', () => {
+      if (!revealed) paintCover();
+    });
+  }
 })();

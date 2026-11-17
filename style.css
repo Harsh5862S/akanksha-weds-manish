@@ -145,7 +145,7 @@ footer {text-align:center;background:var(--wine);color:#ead8b8;padding:18px;font
   border-radius: 4px;
   overflow: hidden;
   isolation: isolate;
-  touch-action: pan-y;
+  touch-action: none;
   box-shadow: 0 5px 16px rgba(91, 23, 37, .12);
 }
 .scratch-date .date-box {
@@ -158,6 +158,7 @@ footer {text-align:center;background:var(--wine);color:#ead8b8;padding:18px;font
 .scratch-layer {
   position: absolute;
   inset: 0;
+  display: block;
   width: 100%;
   height: 100%;
   z-index: 2;
@@ -171,7 +172,7 @@ footer {text-align:center;background:var(--wine);color:#ead8b8;padding:18px;font
   display: grid;
   place-items: center;
   color: #fff9ed;
-  background: linear-gradient(135deg, #8d642e, #d8b46f 45%, #9c713b);
+  background: transparent;
   font: 700 11px Arial, sans-serif;
   letter-spacing: .2em;
   pointer-events: none;
