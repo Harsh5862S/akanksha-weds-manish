@@ -46,3 +46,9 @@ The spelling “Surkhsha” and venue spelling “SAVITRII LAWNS” are retained
 - Page order is now: wedding date/scratch reveal first, programme second, family invitation third.
 - Added the supplied `Din Shagna Da` MP3 as optional looping background music. Visitors start/pause it using the floating music control; audible autoplay is not forced by browsers.
 - Music file is stored at `assets/din-shagna-da.mp3`.
+
+
+## Latest updates
+- Section order: wedding date/scratch reveal first, family invitation second, programme/venue third.
+- Background music attempts to autoplay on page load and starts on the visitor's first interaction if the browser blocks audible autoplay. A music toggle remains available.
+- Browsers may block audible autoplay unless the visitor has interacted with the page or previously allowed sound. This browser policy cannot be reliably overridden by website code.
