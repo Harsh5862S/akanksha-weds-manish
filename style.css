@@ -1,0 +1,134 @@
+ :root {
+  --wine: #5b1725;
+  --wine-deep: #3e101b;
+  --gold: #b58a4a;
+  --gold-light: #e4c994;
+  --ink: #342326;
+  --paper: #fffaf0;
+  --paper-deep: #f5ead8;
+}
+* { box-sizing: border-box; }
+html { scroll-behavior: smooth; }
+body {
+  margin: 0; color: var(--ink);
+  background: radial-gradient(ellipse at top, #fff9ef 0%, #eadbc4 58%, #e3cfb5 100%);
+  font-family: "Cormorant Garamond", Georgia, serif;
+}
+.topbar {
+  display:flex; align-items:center; justify-content:center; gap:18px;
+  padding:17px 12px; color:#f5e4c6; background:var(--wine);
+  font: 600 10px/1.2 Arial,sans-serif; letter-spacing:.32em;
+}
+.topbar-mark { color:var(--gold-light); font-size:15px; }
+main { width:min(920px, calc(100% - 28px)); margin:34px auto 54px; }
+.invitation-panel {
+  position:relative; overflow:hidden; margin:0 auto 34px;
+  background:linear-gradient(145deg, rgba(255,255,255,.96), rgba(255,249,237,.98));
+  border:1px solid var(--gold); outline:1px solid rgba(181,138,74,.42);
+  outline-offset:-8px; box-shadow:0 18px 55px rgba(63,35,24,.13);
+}
+.invitation-panel::before {
+  content:""; position:absolute; inset:15px; border:1px solid rgba(181,138,74,.48);
+  pointer-events:none;
+}
+.hero { padding:58px 48px 44px; text-align:center; }
+.hero-inner { position:relative; z-index:1; }
+.corner { position:absolute; color:var(--gold); font-size:55px; line-height:1; opacity:.8; }
+.corner-tl {top:14px;left:18px}.corner-tr {top:14px;right:18px;transform:scaleX(-1)}
+.corner-bl {bottom:14px;left:18px;transform:scaleY(-1)}.corner-br {bottom:14px;right:18px;transform:scale(-1)}
+.ganesh-symbol {
+  width:74px;height:74px;margin:0 auto 17px;border:1px solid var(--gold);
+  outline:1px solid var(--gold);outline-offset:5px;border-radius:50%;
+  display:grid;place-content:center;color:var(--wine);font-size:32px;line-height:.8;
+}
+.ganesh-symbol span {font:500 12px "Noto Serif Devanagari",serif;margin-top:5px}
+.devotional {font-family:"Noto Serif Devanagari",serif;font-size:17px;font-weight:600;color:var(--wine);margin:12px 0}
+.sanskrit {font-family:"Noto Serif Devanagari",serif;font-size:16px;line-height:1.9;margin:8px auto 19px}
+.fine-rule {display:flex;align-items:center;justify-content:center;gap:14px;color:var(--gold);margin:18px auto;max-width:340px}
+.fine-rule::before,.fine-rule::after {content:"";height:1px;background:var(--gold);flex:1}
+.fine-rule span {font-size:22px}
+.host-line {font-size:21px;margin:18px 0 8px}
+.invitation-copy {font-size:20px;font-weight:600;font-style:italic;line-height:1.35;margin:8px 0 18px}
+h1,h2,h3,p {margin-top:0}
+.hero h1,.hero h2 {font-family:"Great Vibes",cursive;color:var(--wine);font-weight:400;line-height:1;margin:8px 0}
+.hero h1 {font-size:clamp(64px,10vw,94px)}
+.hero h2 {font-size:clamp(60px,9vw,82px)}
+.parent-line {font-size:21px;margin:4px 0 15px}
+.with {font-family:"Great Vibes",cursive;color:var(--gold);font-size:36px;margin:9px 0 0}
+.residence {font-style:italic;font-weight:700;font-size:18px;margin:10px 0 3px}
+.address {font:600 19px Arial,sans-serif}
+.floral-divider {color:var(--gold);font-size:27px;letter-spacing:5px;margin:28px auto 34px}
+.family-footer {display:flex;justify-content:space-between;gap:20px;text-align:left;font-family:Arial,sans-serif;font-size:14px}
+.family-footer div {display:flex;flex-direction:column;gap:7px}
+.family-footer strong {font-size:15px}.regards {text-align:right}
+.small-caps {font-weight:700;letter-spacing:.25em}
+.programme {padding:55px 64px 48px;text-align:center}
+.section-kicker {font-family:"Noto Serif Devanagari",serif;color:var(--gold);letter-spacing:.1em}
+.ganesh-small {font-size:38px;color:var(--wine);margin:9px 0}
+.hindi {font-size:15px;margin-bottom:12px}
+.eyebrow {font:600 10px Arial,sans-serif;letter-spacing:.28em;color:var(--gold);margin:22px 0 8px}
+.section-title {font-size:clamp(48px,7vw,65px);font-weight:500;font-style:italic;text-transform:uppercase;letter-spacing:.05em;color:var(--wine);margin:0 0 34px}
+.event {max-width:590px;margin:0 auto 30px;text-align:left}
+.event-date {font-size:29px;font-weight:600;font-style:italic;text-align:center;color:var(--wine);margin-bottom:17px}
+.event-row {display:flex;align-items:baseline;gap:10px;font-size:22px;margin:11px 0}
+.event-row i {flex:1;border-bottom:1px dotted var(--gold);min-width:12px}
+.event-row strong {font-size:21px;font-weight:600;white-space:nowrap}
+.venue-card {max-width:470px;margin:40px auto 24px;padding:22px 18px 18px;border-top:3px double var(--gold);border-bottom:3px double var(--gold);position:relative}
+.venue-label {font:600 10px Arial,sans-serif;letter-spacing:.35em;color:var(--gold)}
+.venue-card h3 {font:700 clamp(25px,5vw,37px) Arial,sans-serif;letter-spacing:.04em;color:var(--wine);margin:8px 0}
+.venue-card p {font-size:23px;font-style:italic;margin:0 0 10px}
+.text-link {color:var(--wine);font:600 12px Arial,sans-serif;letter-spacing:.08em;text-decoration-color:var(--gold);text-underline-offset:4px}
+.special-invite {display:inline-flex;flex-direction:column;gap:6px;border:1px solid var(--gold);padding:13px 30px;margin-top:12px;background:#fffdf8}
+.special-invite span {font-size:16px;font-style:italic}.special-invite strong {font-size:31px;font-style:italic;color:var(--wine)}
+.save-date {min-height:650px;display:flex;flex-direction:column;justify-content:space-between;padding:56px 54px 34px}
+.save-date-content {text-align:center;position:relative;z-index:1}
+.script-heading {font:400 clamp(52px,8vw,78px) "Great Vibes",cursive;color:var(--wine);margin:0}
+.ornament {color:var(--gold);font-size:25px;margin:5px 0 28px}
+.couple-line {display:flex;justify-content:center;align-items:center;gap:18px;color:var(--wine);font:400 clamp(34px,6vw,54px) "Great Vibes",cursive;margin:0 0 20px}
+.couple-line em {font:italic 17px "Cormorant Garamond",serif;color:var(--ink)}
+.date-box {display:inline-block;border:1px solid var(--gold);padding:10px 22px;font-size:24px;font-weight:600;font-style:italic;margin:0}
+.countdown-wrap {margin-top:44px}
+.countdown {display:flex;justify-content:center;gap:12px;margin:18px auto 0}
+.countdown div {min-width:78px;padding:13px 10px;background:var(--wine);color:#fff7e9;border-radius:3px;display:flex;flex-direction:column;gap:4px}
+.countdown strong {font:600 26px Arial,sans-serif}.countdown span {font:10px Arial,sans-serif;letter-spacing:.12em;text-transform:uppercase;color:var(--gold-light)}
+.contact-block {display:flex;align-items:flex-end;justify-content:space-between;gap:20px;margin-top:45px;position:relative;z-index:1}
+.contact-kicker {font-size:22px;font-style:italic;margin-bottom:4px}
+.contact-block h3 {font-size:34px;color:var(--wine);margin:0 0 3px}
+.contact-block p {font-size:18px;margin:4px 0}
+.phone {font-style:italic}.phone a {color:inherit;text-decoration:none}
+.hearts {font:100px/1 Georgia,serif;color:var(--wine);position:relative;padding-right:16px}
+.hearts span {position:absolute;right:0;top:28px;font-size:70px}
+.action-row {display:flex;justify-content:center;gap:12px;flex-wrap:wrap}
+.action-button {border:1px solid var(--wine);background:var(--wine);color:#fff7e9;padding:13px 20px;font:600 11px Arial,sans-serif;letter-spacing:.1em;text-transform:uppercase;cursor:pointer;transition:.2s}
+.action-button:hover {background:var(--wine-deep);transform:translateY(-2px)}
+.action-button.secondary {background:transparent;color:var(--wine)}
+.action-button.secondary:hover {background:#fff8ed}
+.toast {min-height:20px;text-align:center;color:var(--wine);font:13px Arial,sans-serif;margin:14px 0 0}
+footer {text-align:center;background:var(--wine);color:#ead8b8;padding:18px;font:10px Arial,sans-serif;letter-spacing:.25em}
+@media(max-width:600px) {
+  main {width:calc(100% - 16px);margin:16px auto 32px}
+  .hero {padding:45px 23px 34px}
+  .corner {font-size:35px}.corner-tl,.corner-bl{left:12px}.corner-tr,.corner-br{right:12px}
+  .host-line {font-size:17px}.invitation-copy {font-size:18px}
+  .parent-line {font-size:17px}.address {font-size:15px}
+  .family-footer {font-size:12px;gap:10px}.family-footer strong {font-size:12px}
+  .programme {padding:44px 25px 36px}
+  .event-date {font-size:24px}.event-row {font-size:18px;gap:7px}.event-row strong {font-size:17px}
+  .venue-card p {font-size:20px}
+  .save-date {padding:45px 24px 28px;min-height:590px}
+  .couple-line {gap:10px}.couple-line em {font-size:14px}
+  .date-box {font-size:19px;padding:9px 12px}
+  .countdown {gap:6px}.countdown div {min-width:0;flex:1;padding:11px 4px}
+  .countdown strong {font-size:21px}.countdown span {font-size:8px;letter-spacing:.06em}
+  .contact-block {align-items:flex-start}.contact-kicker {font-size:18px}
+  .contact-block h3 {font-size:27px}.contact-block p {font-size:14px}
+  .hearts {font-size:70px;padding-right:7px}.hearts span {font-size:48px;top:20px}
+  .action-row {padding:0 8px}.action-button {flex:1 1 145px;padding:13px 8px;font-size:10px}
+}
+@media print {
+  body {background:#fff}
+  .topbar,footer,.action-row,.toast {display:none!important}
+  main {width:100%;margin:0}
+  .invitation-panel {box-shadow:none;break-inside:avoid;margin-bottom:12px}
+  .hero,.programme,.save-date {page-break-inside:avoid}
+}
