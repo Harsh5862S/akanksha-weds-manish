@@ -56,3 +56,7 @@ The spelling “Surkhsha” and venue spelling “SAVITRII LAWNS” are retained
 
 ## Typography refinement
 The bride and groom names use the Allura script font so the capital A in “Akanksha” has a clearer, more recognizable letterform.
+
+
+### Capital A typography update
+The first date panel couple names and the family invitation names both use the Allura script font so the capital A in Akanksha is easier to distinguish from a G.

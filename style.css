@@ -84,7 +84,7 @@ h1,h2,h3,p {margin-top:0}
 .save-date-content {text-align:center;position:relative;z-index:1}
 .script-heading {font:400 clamp(52px,8vw,78px) "Great Vibes",cursive;color:var(--wine);margin:0}
 .ornament {color:var(--gold);font-size:25px;margin:5px 0 28px}
-.couple-line {display:flex;justify-content:center;align-items:center;gap:18px;color:var(--wine);font:400 clamp(34px,6vw,54px) "Great Vibes",cursive;margin:0 0 20px}
+.couple-line {display:flex;justify-content:center;align-items:center;gap:18px;color:var(--wine);font:400 clamp(34px,6vw,54px) "Allura",cursive;margin:0 0 20px}
 .couple-line em {font:italic 17px "Cormorant Garamond",serif;color:var(--ink)}
 .date-box {display:inline-block;border:1px solid var(--gold);padding:10px 22px;font-size:24px;font-weight:600;font-style:italic;margin:0}
 .countdown-wrap {margin-top:44px}
